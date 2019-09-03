@@ -1,25 +1,22 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Threading;
+using NLog;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+/* 
+ * вводный комментарий ???
+ * 
+*/
 namespace Monitor
 {
     static class Log
     {
-        static public void WriteError()
-        {
-
-        }
-        static public void WriteKill()
-        {
-
-        }
-
+        internal static Logger logger = LogManager.GetCurrentClassLogger();
     }
+
     static class Monitor
     {
         private static int lifeTime;
@@ -30,6 +27,7 @@ namespace Monitor
             var processName = parameters[0];
             if (Int32.TryParse(parameters[1], out lifeTime))
             {
+                var maxTime = DateTime.Now.AddHours(lifeTime) - DateTime.Now;
                 Process[] localByName = Process.GetProcessesByName(processName);
                 if (localByName.Length == 0)
                     return;
@@ -37,7 +35,7 @@ namespace Monitor
                     foreach (Process p in localByName)
                     {
                         var workTime = DateTime.Now - p.StartTime;
-                        if (workTime > lifeTime)
+                        if (workTime > maxTime)
                         {
                             Killer.KillProcess(processName);
                             return;
@@ -45,8 +43,7 @@ namespace Monitor
                     }
             }
             else
-                Log.WriteError();
-
+                Log.logger.Error("Error in type conversion. The second argument does not match a numeric value.");
         }
 
     }
@@ -59,14 +56,12 @@ namespace Monitor
             {
                 p.Kill();
             }
-            Log.WriteKill();
-
+            Log.logger.Debug($"Process {processName} has been completed");
         }
     }
     static class Clock
     {
         private static int periodicity;
-
         static public void CallMonitor(string[] args)
         {
             var array = (object)args;
@@ -77,7 +72,7 @@ namespace Monitor
                 Timer timer = new Timer(tm, array, 0, miliSeconds);
             }
             else
-                Log.WriteError();
+                Log.logger.Error("Error in type conversion. The third argument does not match a numeric value.");
         }
     }
     class Program
@@ -87,7 +82,7 @@ namespace Monitor
             if (args.Length == 3)
                 Clock.CallMonitor(args);
             else
-                Log.WriteError();
+                Log.logger.Error("Invalid input: number of array elements other than 3");
         }
     }
 }
