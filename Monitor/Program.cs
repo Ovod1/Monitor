@@ -19,7 +19,7 @@ namespace Monitor
             Log.logger.Debug("Launched method CheckProcess");
             var parameters = (string[])array;
             var processName = parameters[0];
-            if (Int32.TryParse(parameters[1], out lifeTime))
+            if (Int32.TryParse(parameters[1], out lifeTime) && lifeTime >= 0)
             {
                 var maxTime = DateTime.Now.AddMinutes(lifeTime) - DateTime.Now;
                 Process[] localByName = Process.GetProcessesByName(processName);
@@ -61,7 +61,7 @@ namespace Monitor
         static public void CallMonitor(string[] args)
         {
             var array = (object)args;
-            if (Int32.TryParse(args[2], out periodicity))
+            if (Int32.TryParse(args[2], out periodicity)&& periodicity >= 0)
             {
                 var miliSeconds = periodicity * 60000;
                 TimerCallback tm = new TimerCallback(Monitor.CheckProcess);
