@@ -2,14 +2,7 @@
 using System.Diagnostics;
 using System.Threading;
 using NLog;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-/* 
- * вводный комментарий ???
- * 
-*/
+
 namespace Monitor
 {
     static class Log
@@ -23,14 +16,17 @@ namespace Monitor
 
         static public void CheckProcess(object array)
         {
+            Log.logger.Debug("Launched method CheckProcess");
             var parameters = (string[])array;
             var processName = parameters[0];
             if (Int32.TryParse(parameters[1], out lifeTime))
             {
-                var maxTime = DateTime.Now.AddHours(lifeTime) - DateTime.Now;
+                var maxTime = DateTime.Now.AddMinutes(lifeTime) - DateTime.Now;
                 Process[] localByName = Process.GetProcessesByName(processName);
                 if (localByName.Length == 0)
-                    return;
+                {
+                    Log.logger.Debug("Process not found");
+                }
                 else
                     foreach (Process p in localByName)
                     {
@@ -38,7 +34,7 @@ namespace Monitor
                         if (workTime > maxTime)
                         {
                             Killer.KillProcess(processName);
-                            return;
+                            break;
                         }
                     }
             }
@@ -75,14 +71,15 @@ namespace Monitor
                 Log.logger.Error("Error in type conversion. The third argument does not match a numeric value.");
         }
     }
-    class Program
+    static class Program
     {
-        static void Main(string[] args)
+        static public void Main(string[] args)
         {
+            Log.logger.Debug("Program was started");
             if (args.Length == 3)
                 Clock.CallMonitor(args);
             else
-                Log.logger.Error("Invalid input: number of array elements other than 3");
+                Log.logger.Error("Invalid input: number of array elements other than three");
         }
     }
 }
