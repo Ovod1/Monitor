@@ -9,11 +9,9 @@ namespace Monitor
     {
         internal static Logger logger = LogManager.GetCurrentClassLogger();
     }
-
     static class Monitor
     {
         private static int lifeTime;
-
         static public void CheckProcess(object array)
         {
             Log.logger.Debug("Launched method CheckProcess");
@@ -41,7 +39,6 @@ namespace Monitor
             else
                 Log.logger.Error("Error in type conversion. The second argument does not match a numeric value.");
         }
-
     }
     static class Killer
     {
